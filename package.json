@@ -1,6 +1,6 @@
 {
   "name": "react-cash",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "license": "MIT",
   "source": "./src/ReactCash.ts",
   "main": "./dist/react-cash.js",
