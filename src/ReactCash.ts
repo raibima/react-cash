@@ -26,9 +26,12 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
     unstable_gcReleaseBufferMaxSize: maxBufferSize = 10,
   } = options;
 
-  function getKey(...args: Parameters<F>) {
-    return typeof keyOrKeyGen === "string" ? keyOrKeyGen : keyOrKeyGen(...args);
-  }
+  /**
+   * Warms up the cache.
+   * 
+   * Suggestion: call `prepare` before `useResource`.
+   * If possible, do that in parallel with loading the UI code.
+   */
   function prepare(...args: Parameters<F>) {
     const key = getKey(...args);
     const record = cache.get(key);
@@ -39,31 +42,13 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
     }
     return Promise.resolve();
   }
-  function read(key: string, ...args: Parameters<F>) {
-    const record = cache.get(key);
-    if (!record || record instanceof Error) {
-      const promise = resolveNetwork(key, ...args);
-      cache.set(key, promise);
-      throw promise;
-    }
-    if (record instanceof Promise) {
-      throw record;
-    }
-    if (fetchPolicy === "cache_and_network") {
-      resolveNetwork(key, ...args);
-    }
-    return record;
-  }
-  function resolveNetwork(key: string, ...args: Parameters<F>) {
-    return fn(...args).then(
-      (r) => {
-        cache.set(key, r);
-      },
-      (e) => {
-        cache.set(key, e);
-      }
-    );
-  }
+  /**
+   * Hook for consuming the resource inside a React component.
+   * 
+   * const [value, setValue] = MyResource.useResource();
+   * 
+   * Suggestion: use the updater function to perform a local mutation.
+   */
   function useResource(...args: Parameters<F>) {
     const key = getKey(...args);
     const [value, setValue] = React.useState<Value>(read(key, ...args));
@@ -83,6 +68,57 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
 
     return [value, setValue] as const;
   }
+  /**
+   * Retrieve the current value of the cache, given some arguments.
+   * 
+   * Suggestion: use this to kick off a `prepare` that depends on the
+   * result of another resource's `prepare`.
+   * 
+   * TopStories.prepare().then(() => {
+   *   const storyIds = TopStories.get();
+   *   storyIds.forEach(id => Story.prepare(id));
+   * });
+   */
+  function get(...args: Parameters<F>) {
+    const key = getKey(...args);
+    return cache.get(key);
+  }
+
+  /**
+   * ReactCash internals
+   */
+
+  function getKey(...args: Parameters<F>) {
+    return typeof keyOrKeyGen === "string" ? keyOrKeyGen : keyOrKeyGen(...args);
+  }
+
+  function read(key: string, ...args: Parameters<F>) {
+    const record = cache.get(key);
+    if (!record || record instanceof Error) {
+      const promise = resolveNetwork(key, ...args);
+      cache.set(key, promise);
+      throw promise;
+    }
+    if (record instanceof Promise) {
+      throw record;
+    }
+    if (fetchPolicy === "cache_and_network") {
+      resolveNetwork(key, ...args);
+    }
+    return record;
+  }
+
+  function resolveNetwork(key: string, ...args: Parameters<F>) {
+    return fn(...args).then(
+      (r) => {
+        cache.set(key, r);
+      },
+      (e) => {
+        cache.set(key, e);
+      }
+    );
+  }
+
   function acquireLifetime(key: string) {
     const currentRefCount = refCount.get(key);
     if (!currentRefCount) {
@@ -94,6 +130,7 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
       gcReleaseBuffer.delete(key);
     }
   }
+
   function enqueueCleanup(key: string) {
     const currentRefCount = refCount.get(key);
     if (currentRefCount === 0) {
@@ -104,15 +141,13 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
       }
     }
   }
+
   function flushGc() {
     gcReleaseBuffer.forEach((key) => {
       cache.delete(key);
       refCount.delete(key);
     });
   }
-  function get(...args: Parameters<F>) {
-    const key = getKey(...args);
-    return cache.get(key);
-  }
-  return { read, prepare, get, useResource };
+
+  return { prepare, useResource, get };
 }
