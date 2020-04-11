@@ -7,8 +7,8 @@
   "module": "dist/react-cash.module.js",
   "unpkg": "dist/react-cash.umd.js",
   "scripts": {
-    "dev": "microbundle watch --external react --jsx react",
-    "build": "microbundle build --external react --jsx react",
+    "dev": "microbundle watch --external react",
+    "build": "microbundle build --external react",
     "bump-alpha": "npm version preminor --preid=alpha",
     "bump-rc": "npm version prerelease --preid=rc",
     "bump-stable": "npm version minor",
