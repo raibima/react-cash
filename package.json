@@ -9,7 +9,10 @@
   "scripts": {
     "dev": "microbundle watch --external react --jsx react",
     "build": "microbundle build --external react --jsx react",
-    "bump-alpha": "npm version preminor --preid=alpha"
+    "bump-alpha": "npm version preminor --preid=alpha",
+    "bump-rc": "npm version prerelease --preid=rc",
+    "bump-stable": "npm version minor",
+    "bump": "npm version prerelease"
   },
   "devDependencies": {
     "microbundle": "^0.11.0",
