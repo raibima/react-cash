@@ -134,13 +134,15 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
   }
 
   function enqueueCleanup(key: string) {
-    const currentRefCount = refCount.get(key);
-    if (currentRefCount === 0) {
+    const nextRefCount = refCount.get(key) - 1;
+    if (nextRefCount === 0) {
       refCount.delete(key);
       gcReleaseBuffer.add(key);
       if (gcReleaseBuffer.size > maxBufferSize) {
         flushGc();
       }
+    } else {
+      refCount.set(key, nextRefCount);
     }
   }
 
