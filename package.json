@@ -1,13 +1,15 @@
 {
   "name": "react-cash",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "license": "MIT",
   "source": "./src/ReactCash.ts",
   "main": "./dist/react-cash.js",
   "module": "./dist/react-cash.module.js",
   "unpkg": "./dist/react-cash.umd.js",
   "typings": "./dist/ReactCash.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "microbundle watch --external react",
     "build": "microbundle build --external react",
