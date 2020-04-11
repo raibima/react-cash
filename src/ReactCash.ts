@@ -66,7 +66,7 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
   }
   function useResource(...args: Parameters<F>) {
     const key = getKey(...args);
-    const [value, setValue] = React.useState(read(key, ...args));
+    const [value, setValue] = React.useState<Value>(read(key, ...args));
     const didMount = React.useRef(false);
 
     React.useEffect(() => {

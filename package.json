@@ -2,10 +2,11 @@
   "name": "react-cash",
   "version": "0.0.0",
   "license": "MIT",
-  "source": "src/ReactCash.ts",
-  "main": "dist/react-cash.js",
-  "module": "dist/react-cash.module.js",
-  "unpkg": "dist/react-cash.umd.js",
+  "source": "./src/ReactCash.ts",
+  "main": "./dist/react-cash.js",
+  "module": "./dist/react-cash.module.js",
+  "unpkg": "./dist/react-cash.umd.js",
+  "typings": "./dist/ReactCash.d.ts",
   "scripts": {
     "dev": "microbundle watch --external react",
     "build": "microbundle build --external react",
@@ -15,7 +16,9 @@
     "bump": "npm version prerelease"
   },
   "devDependencies": {
+    "@types/react": "^16.9.34",
     "microbundle": "^0.11.0",
-    "react": "^0.0.0-experimental-e5d06e34b"
+    "react": "^0.0.0-experimental-e5d06e34b",
+    "react-dom": "^0.0.0-experimental-e5d06e34b"
   }
 }
