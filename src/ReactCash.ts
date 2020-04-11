@@ -7,6 +7,7 @@ type PromiseType<T extends Promise<any>> = T extends Promise<infer U>
 type FetchPolicy = "cache_or_network" | "cache_and_network";
 type ResourceOptions = {
   fetchPolicy?: FetchPolicy;
+  unstable_gcReleaseBufferMaxSize?: number;
 };
 
 export function createResource<F extends (...args: any[]) => Promise<any>>(
@@ -18,11 +19,12 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
   type CacheRecord = Promise<void> | Value | Error;
   const cache = new Map<string, CacheRecord>();
   const refCount = new Map<string, number>();
-
   const gcReleaseBuffer = new Set<string>();
-  const maxBufferSize = 10;
 
-  const { fetchPolicy = "cache_or_network" } = options;
+  const {
+    fetchPolicy = "cache_or_network",
+    unstable_gcReleaseBufferMaxSize: maxBufferSize = 10,
+  } = options;
 
   function getKey(...args: Parameters<F>) {
     return typeof keyOrKeyGen === "string" ? keyOrKeyGen : keyOrKeyGen(...args);
@@ -39,7 +41,6 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
   }
   function read(key: string, ...args: Parameters<F>) {
     const record = cache.get(key);
-
     if (!record || record instanceof Error) {
       const promise = resolveNetwork(key, ...args);
       cache.set(key, promise);
