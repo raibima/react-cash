@@ -8,12 +8,10 @@ export default function prepareStories(limit: number) {
   const { prepare: prepareTopStories, get: getTopStories } = TopStoriesResource;
 
   prepareTopStories().then(() => {
-    const topStories = getTopStories();
-    if (Array.isArray(topStories)) {
-      topStories.slice(0, limit).forEach((storyId) => {
-        prepareStory(storyId);
-      });
-    }
+    const topStories = getTopStories() as number[];
+    topStories.slice(0, limit).forEach((storyId) => {
+      prepareStory(storyId);
+    });
   });
 
   return {
