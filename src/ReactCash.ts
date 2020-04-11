@@ -42,6 +42,7 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
     }
     return Promise.resolve();
   }
+
   /**
    * Hook for consuming the resource inside a React component.
    * 
@@ -68,6 +69,7 @@ export function createResource<F extends (...args: any[]) => Promise<any>>(
 
     return [value, setValue] as const;
   }
+  
   /**
    * Retrieve the current value of the cache, given some arguments.
    * 
