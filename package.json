@@ -21,7 +21,7 @@
   "devDependencies": {
     "@types/react": "^16.9.34",
     "microbundle": "^0.11.0",
-    "react": "^0.0.0-experimental-e5d06e34b",
+    "react": "^0.14.0",
     "react-dom": "^0.0.0-experimental-e5d06e34b"
   }
 }
